@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { useAuth } from '../context/AuthContext';
 import { SimulationRecord, FutureCase } from '../types';
 import { motion } from 'motion/react';
 import { AlertTriangle, TrendingUp, TrendingDown, BrainCircuit, ArrowLeft, Loader2, Activity } from 'lucide-react';
@@ -10,15 +9,15 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGri
 
 export default function ResultsPage() {
   const { id } = useParams();
-  const { user } = useAuth();
   const [data, setData] = useState<SimulationRecord | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id || !user) return;
+    if (!id) return;
     const fetchDoc = async () => {
       try {
-        const d = await getDoc(doc(db, 'users', user.uid, 'simulations', id));
+        // Updated to read from the global 'simulations' collection since auth is removed
+        const d = await getDoc(doc(db, 'simulations', id));
         if (d.exists()) {
           setData(d.data() as SimulationRecord);
         }
@@ -29,7 +28,7 @@ export default function ResultsPage() {
       }
     };
     fetchDoc();
-  }, [id, user]);
+  }, [id]);
 
   if (loading) return <div className="flex-1 flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-cyan-500" /></div>;
   if (!data) return <div className="p-8 text-center text-slate-400">Simulation not found.</div>;
@@ -116,7 +115,6 @@ function ScenarioCard({ type, data, prob }: { type: 'best'|'average'|'worst', da
     worst: <TrendingDown className="w-5 h-5 text-red-500" />
   };
 
-  // Convert skills and risks to array safely since AI might return strings or weird arrays
   const parseList = (val: any) => Array.isArray(val) ? val : String(val).split(',').map(s=>s.trim());
 
   return (

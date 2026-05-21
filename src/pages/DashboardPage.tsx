@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { Loader2, Zap } from 'lucide-react';
 import { SimulationInput, SimulationOutput } from '../types';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SimulationInput>({
-    name: user?.displayName || '',
+    name: '',
     educationLevel: 'Bachelors in Computer Science',
     currentSkills: 'React, TypeScript, Python',
     careerGoals: 'Senior AI Engineer or Tech Lead',
@@ -30,7 +28,6 @@ export default function DashboardPage() {
 
   const handleSimulate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
     setLoading(true);
     
     try {
@@ -46,8 +43,9 @@ export default function DashboardPage() {
       const output: SimulationOutput = await res.json();
       
       const simulationId = crypto.randomUUID();
-      await setDoc(doc(db, 'users', user.uid, 'simulations', simulationId), {
-        userId: user.uid,
+      
+      // Saves to a general 'simulations' collection since user auth is removed
+      await setDoc(doc(db, 'simulations', simulationId), {
         input: formData,
         output,
         createdAt: Date.now()
@@ -61,10 +59,6 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
-
-  if (!user) {
-    return <div className="p-8 text-center text-slate-400">Please connect identity to access dashboard.</div>;
-  }
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-4xl mx-auto py-12">

@@ -1,12 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Activity, LogOut, LayoutDashboard, History } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Activity, LayoutDashboard, History } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Navbar() {
-  const { user, login, logout } = useAuth();
-  const navigate = useNavigate();
-
   return (
     <motion.nav 
       initial={{ y: -50, opacity: 0 }}
@@ -23,32 +19,14 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center space-x-4">
-            {user ? (
-              <>
-                <Link to="/dashboard" className="text-sm font-medium hover:text-cyan-400 transition-colors hidden sm:flex items-center space-x-1">
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>Dashboard</span>
-                </Link>
-                <Link to="/history" className="text-sm font-medium hover:text-cyan-400 transition-colors hidden sm:flex items-center space-x-1">
-                  <History className="w-4 h-4" />
-                  <span>History</span>
-                </Link>
-                <div className="hidden sm:block w-px h-6 bg-slate-700 mx-2"></div>
-                <div className="flex items-center space-x-3">
-                  <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`} alt="Avatar" className="w-8 h-8 rounded-full border border-cyan-500 shadow-[0_0_10px_rgba(0,240,255,0.3)]" />
-                  <button onClick={() => { logout(); navigate('/'); }} className="p-2 hover:bg-slate-800 rounded-full transition-colors group">
-                    <LogOut className="w-5 h-5 text-slate-400 group-hover:text-red-400 transition-colors" />
-                  </button>
-                </div>
-              </>
-            ) : (
-              <button 
-                onClick={login}
-                className="px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/50 text-cyan-400 font-medium hover:bg-cyan-500 hover:text-slate-900 hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all duration-300"
-              >
-                Connect Identity
-              </button>
-            )}
+            <Link to="/dashboard" className="text-sm font-medium hover:text-cyan-400 transition-colors hidden sm:flex items-center space-x-1">
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Dashboard</span>
+            </Link>
+            <Link to="/history" className="text-sm font-medium hover:text-cyan-400 transition-colors hidden sm:flex items-center space-x-1">
+              <History className="w-4 h-4" />
+              <span>History</span>
+            </Link>
           </div>
         </div>
       </div>

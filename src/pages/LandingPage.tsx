@@ -3,22 +3,10 @@ import { motion } from 'framer-motion';
 import { ArrowRight, BrainCircuit, Activity, LineChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// If you have your AuthContext fully set up, uncomment the line below:
-// import { useAuth } from '../context/AuthContext';
-
 export default function LandingPage() {
   const navigate = useNavigate();
 
-  // DUMMY AUTH STATE: Prevents errors if your context folder isn't set up yet.
-  // Once you have AuthContext, delete these two lines and uncomment: const { user, login } = useAuth();
-  const user = null; 
-  const login = async () => console.log("Login triggered");
-
-  const handleStart = async () => {
-    if (!user) {
-      await login();
-    }
-    // Make sure you have a route set up for '/dashboard' in your App.jsx!
+  const handleStart = () => {
     navigate('/dashboard');
   };
 
@@ -54,7 +42,7 @@ export default function LandingPage() {
             className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-slate-900 border border-cyan-500/50 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] overflow-hidden"
           >
             <span className="relative z-10 flex items-center space-x-3 text-lg">
-              <span>{user ? "Initialize Simulation" : "Connect & Start Simulator"}</span>
+              <span>Initialize Simulation</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </span>
           </motion.button>
@@ -82,8 +70,8 @@ export default function LandingPage() {
   );
 }
 
-// Plain Javascript Component (No TypeScript syntax to prevent .jsx errors)
-function FeatureCard({ icon, title, desc }) {
+// Plain Javascript Component
+function FeatureCard({ icon, title, desc }: any) {
   return (
     <motion.div 
       whileHover={{ y: -5 }}

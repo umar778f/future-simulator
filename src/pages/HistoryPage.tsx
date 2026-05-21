@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import { SimulationRecord } from '../types';
@@ -8,16 +7,15 @@ import { Loader2, Calendar, FileText, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function HistoryPage() {
-  const { user } = useAuth();
   const [history, setHistory] = useState<SimulationRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
     const fetchHistory = async () => {
       try {
+        // Now fetching from the global 'simulations' collection since auth is removed
         const q = query(
-          collection(db, 'users', user.uid, 'simulations'),
+          collection(db, 'simulations'),
           orderBy('createdAt', 'desc')
         );
         const snapshot = await getDocs(q);
@@ -30,9 +28,8 @@ export default function HistoryPage() {
       }
     };
     fetchHistory();
-  }, [user]);
+  }, []);
 
-  if (!user) return <div className="p-8 text-center text-slate-400">Please connect identity to view logs.</div>;
   if (loading) return <div className="flex-1 flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-cyan-500" /></div>;
 
   return (

@@ -44,7 +44,6 @@ export default function DashboardPage() {
       
       const simulationId = crypto.randomUUID();
       
-      // Saves to a general 'simulations' collection since user auth is removed
       await setDoc(doc(db, 'simulations', simulationId), {
         input: formData,
         output,

@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { db } from '../firebase';
-import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import { SimulationRecord } from '../types';
 import { Link } from 'react-router-dom';
 import { Loader2, Calendar, FileText, ArrowRight } from 'lucide-react';
@@ -11,23 +9,10 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        // Now fetching from the global 'simulations' collection since auth is removed
-        const q = query(
-          collection(db, 'simulations'),
-          orderBy('createdAt', 'desc')
-        );
-        const snapshot = await getDocs(q);
-        const records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SimulationRecord));
-        setHistory(records);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
+    // Load from localStorage instead of Firebase
+    const records = JSON.parse(localStorage.getItem('simulations') || '[]');
+    setHistory(records);
+    setLoading(false);
   }, []);
 
   if (loading) return <div className="flex-1 flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-cyan-500" /></div>;

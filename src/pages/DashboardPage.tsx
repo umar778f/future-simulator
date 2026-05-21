@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
 import { Loader2, Zap } from 'lucide-react';
 import { SimulationInput, SimulationOutput } from '../types';
 
@@ -43,12 +41,11 @@ export default function DashboardPage() {
       const output: SimulationOutput = await res.json();
       
       const simulationId = crypto.randomUUID();
-      
-      await setDoc(doc(db, 'simulations', simulationId), {
-        input: formData,
-        output,
-        createdAt: Date.now()
-      });
+
+      // Save to localStorage instead of Firebase
+      const existing = JSON.parse(localStorage.getItem('simulations') || '[]');
+      existing.unshift({ id: simulationId, input: formData, output, createdAt: Date.now() });
+      localStorage.setItem('simulations', JSON.stringify(existing));
 
       navigate(`/results/${simulationId}`);
     } catch (err: any) {

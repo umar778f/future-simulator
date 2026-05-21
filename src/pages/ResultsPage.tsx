@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { SimulationRecord, FutureCase } from '../types';
 import { motion } from 'motion/react';
 import { AlertTriangle, TrendingUp, TrendingDown, BrainCircuit, ArrowLeft, Loader2, Activity } from 'lucide-react';
@@ -14,20 +12,11 @@ export default function ResultsPage() {
 
   useEffect(() => {
     if (!id) return;
-    const fetchDoc = async () => {
-      try {
-        // Updated to read from the global 'simulations' collection since auth is removed
-        const d = await getDoc(doc(db, 'simulations', id));
-        if (d.exists()) {
-          setData(d.data() as SimulationRecord);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDoc();
+    // Load from localStorage instead of Firebase
+    const records = JSON.parse(localStorage.getItem('simulations') || '[]');
+    const record = records.find((r: SimulationRecord) => r.id === id);
+    setData(record || null);
+    setLoading(false);
   }, [id]);
 
   if (loading) return <div className="flex-1 flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-cyan-500" /></div>;
@@ -115,7 +104,7 @@ function ScenarioCard({ type, data, prob }: { type: 'best'|'average'|'worst', da
     worst: <TrendingDown className="w-5 h-5 text-red-500" />
   };
 
-  const parseList = (val: any) => Array.isArray(val) ? val : String(val).split(',').map(s=>s.trim());
+  const parseList = (val: any) => Array.isArray(val) ? val : String(val).split(',').map((s: string) => s.trim());
 
   return (
     <motion.div 
